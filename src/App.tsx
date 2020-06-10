@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 import {Coin, Product } from './types';
@@ -57,7 +56,7 @@ class App extends Component {
 			</div>
 		);
 	}
-	
+	// adds coins to total
 	countCoins = (addedCoin: Coin) => {
 		const coinRefs = Object.values(validCoins)
 		let validCoin = false;
@@ -122,8 +121,3 @@ class App extends Component {
 }
 
 export default App;
-// import React from 'react';
-
-// const App = () => <div className="app-container" >Vending machine</div>;
-
-// export default App;
