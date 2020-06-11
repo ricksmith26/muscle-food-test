@@ -24,3 +24,14 @@ export interface CoinProps {
     errorMSG: string;
     returnMoney: Function;
 }
+
+export interface VendingMachineState {
+    total: number,
+    rejectedCoinsCount: number,
+    change: number,
+    changeGiven: number,
+    bank: number,
+    errorMSG: boolean,
+    error: string
+}
+

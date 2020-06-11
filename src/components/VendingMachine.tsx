@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import {Coin, Product } from '../types';
+import {Coin, Product, VendingMachineState } from '../types';
 import { products, validCoins } from '../coinData';
 import Products from '../components/Products';
 import CoinSlot from '../components/CoinSlot';
@@ -13,12 +13,10 @@ class VendingMachine extends Component {
 		total: 0,
 		rejectedCoinsCount: 0,
 		change: 0,
-		changeCoins: [],
+		changeGiven: 0, 
+		bank: 0.15,
 		errorMSG: '',
 		error: false,
-		changeGiven: 0, 
-		products: [],
-		bank: 10
 	}
 
 	//adds coins to total
@@ -43,9 +41,10 @@ class VendingMachine extends Component {
 	}
 
 	public orderProduct = (product: Product, i: number) => {
+
 		// if sold out
 		if (product.qty === 0) {
-            return this.ifSoldOut(product);
+            return this.ifSoldOut();
 		}
 		// checks enough money is given
 		if (product.cost <= this.state.total) {
@@ -59,13 +58,12 @@ class VendingMachine extends Component {
 		if (this.state.total === 0) {
 			this.setState({total: 0, error: false, changeGiven: 0})
 		}
-		// error for exact change given created
 		if (this.state.bank < 0.15) {
 			this.notEnoughChangeInBank()
 		}
     }
     
-    public ifSoldOut(product: Product) {
+    public ifSoldOut() {
         return this.setState({error: true, errorMSG: 'SOLD OUT'}        
                 , () =>{ 
                 setTimeout(() => {
@@ -83,18 +81,11 @@ class VendingMachine extends Component {
     }
 
     public notEnoughFunds(product: Product) {
-        this.setState({error: true, errorMSG: `PRICE: $${product.cost}`}, () => {
-			setTimeout(() => {
-				this.setState({error: false, errorMSG: ''})
-			}, 5000)
-        })
+        this.setState({error: true, errorMSG: `PRICE: $${product.cost}`},)
     }
 
     public notEnoughChangeInBank() {
         this.setState({error: true, errorMSG: 'EXACT CHANGE NEEDED'})
-			setTimeout(() => {
-				this.setState({error: false, errorMSG: ''})
-			}, 5000)
     }
 
 	public returnMoney = () => {
@@ -110,7 +101,19 @@ class VendingMachine extends Component {
             returnMoney: this.returnMoney,
             total: this.state.total
         }
-    }
+	}
+
+	componentDidMount() {
+		if (this.state.bank < 0.15) {
+			this.setState({error: true, errorMSG: 'Exact Change'})
+		}
+	}
+	
+	componentDidUpdate(prevState: VendingMachineState) {
+		if (prevState.bank !== this.state.bank && this.state.bank < 0.15) {
+			this.setState({error: true, errorMSG: 'Exact Change'})
+		}
+	}
 
 	render() {
 
