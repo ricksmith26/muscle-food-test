@@ -18,7 +18,9 @@ export interface CoinOb {
     [key: string]: Coin
 }
 
-// export interface CoinCount {
-//     qty: number;
-//     coin: Coin
-// }
+export interface CoinProps {
+    total: number;
+    error: boolean;
+    errorMSG: string;
+    returnMoney: Function;
+}

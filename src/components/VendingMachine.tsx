@@ -21,8 +21,96 @@ class VendingMachine extends Component {
 		bank: 10
 	}
 
-	async componentDidMount() {
+	//adds coins to total
+	public countCoins = (addedCoin: Coin) => {
+		const coinRefs = Object.values(validCoins)
+		let validCoin = false;
+
+		coinRefs.forEach((coinRef) => {
+			if (coinRef.diameter === addedCoin.diameter
+				&& coinRef.weight === addedCoin.weight
+				&& coinRef.thickness === addedCoin.thickness) {
+				validCoin = true
+			}
+		})
+
+		if (validCoin) {
+			this.setState({total: this.state.total + addedCoin.value })
+		} else {
+			const rejectedCoinsCount = this.state.rejectedCoinsCount + 1;
+			this.setState({rejectedCoinsCount})
+		}
 	}
+
+	public orderProduct = (product: Product, i: number) => {
+		// if sold out
+		if (product.qty === 0) {
+            return this.ifSoldOut(product);
+		}
+		// checks enough money is given
+		if (product.cost <= this.state.total) {
+			this.successfulPurchase(product, i)
+		}
+		//not Enough Funds
+		if (product.cost > this.state.total) {
+			this.notEnoughFunds(product)
+		}
+		// resets errors
+		if (this.state.total === 0) {
+			this.setState({total: 0, error: false, changeGiven: 0})
+		}
+		// error for exact change given created
+		if (this.state.bank < 0.15) {
+			this.notEnoughChangeInBank()
+		}
+    }
+    
+    public ifSoldOut(product: Product) {
+        return this.setState({error: true, errorMSG: 'SOLD OUT'}        
+                , () =>{ 
+                setTimeout(() => {
+                    this.setState({error: false})
+                }, 5000)})
+    }
+
+    public successfulPurchase(product: Product, i: number) {
+        products[i].qty-= 1; 
+        this.setState({changeGiven: this.state.total - product.cost, total: 0, bank: this.state.bank + product.cost}, () => {
+                setTimeout(() => {
+                    this.setState({changeGiven: 0})
+                }, 5000)
+            })
+    }
+
+    public notEnoughFunds(product: Product) {
+        this.setState({error: true, errorMSG: `PRICE: $${product.cost}`}, () => {
+			setTimeout(() => {
+				this.setState({error: false, errorMSG: ''})
+			}, 5000)
+        })
+    }
+
+    public notEnoughChangeInBank() {
+        this.setState({error: true, errorMSG: 'EXACT CHANGE NEEDED'})
+			setTimeout(() => {
+				this.setState({error: false, errorMSG: ''})
+			}, 5000)
+    }
+
+	public returnMoney = () => {
+		const change = this.state.total;
+		this.setState({total: 0, changeGiven: change})
+    }
+
+    private getCoinSlotSearchBarProps = () => {
+
+        return {
+            error: this.state.error,
+            errorMSG: this.state.errorMSG,
+            returnMoney: this.returnMoney,
+            total: this.state.total
+        }
+    }
 
 	render() {
 
@@ -54,106 +142,6 @@ class VendingMachine extends Component {
 			</div>
 		);
 	}
-	countCoins = (addedCoin: Coin) => {
-		const coinRefs = Object.values(validCoins)
-		let validCoin = false;
-
-		coinRefs.forEach((coinRef) => {
-			if (coinRef.diameter === addedCoin.diameter
-				&& coinRef.weight === addedCoin.weight
-				&& coinRef.thickness === addedCoin.thickness) {
-				validCoin = true
-			}
-		})
-
-		if (validCoin) {
-			this.setState({total: this.state.total + addedCoin.value })
-		} else {
-			const rejectedCoinsCount = this.state.rejectedCoinsCount + 1;
-			this.setState({rejectedCoinsCount})
-		}
-	}
-
-
-	orderProduct = (product: Product, i: number) => {
-		// if sold out
-		if (product.qty === 0) {
-            return this.ifSoldOut(product);
-		}
-		// checks enough money is given
-		if (product.cost <= this.state.total) {
-			this.successfulPurchase(product, i)
-		}
-		//not Enough Funds
-		if (product.cost > this.state.total) {
-			this.notEnoughFunds(product)
-		}
-		// resets errors
-		if (this.state.total === 0) {
-			this.setState({total: 0, error: false, changeGiven: 0})
-		}
-		// error for exact change given created
-		if (this.state.bank < 0.15) {
-			this.notEnoughChangeInBank()
-		}
-    }
-    
-    ifSoldOut(product: Product) {
-        return this.setState({error: true, errorMSG: 'SOLD OUT'}        
-                , () =>{ 
-                setTimeout(() => {
-                    this.setState({error: false})
-                }, 5000)})
-    }
-
-    successfulPurchase(product: Product, i: number) {
-        products[i].qty-= 1; 
-        this.setState({changeGiven: this.state.total - product.cost, total: 0, bank: this.state.bank + product.cost}, () => {
-                setTimeout(() => {
-                    this.setState({changeGiven: 0})
-                }, 5000)
-            })
-    }
-
-    notEnoughFunds(product: Product) {
-        this.setState({error: true, errorMSG: `PRICE: $${product.cost}`}, () => {
-			setTimeout(() => {
-				this.setState({error: false, errorMSG: ''})
-			}, 5000)
-        })
-    }
-
-    notEnoughChangeInBank() {
-        this.setState({error: true, errorMSG: 'EXACT CHANGE NEEDED'})
-			setTimeout(() => {
-				this.setState({error: false, errorMSG: ''})
-			}, 5000)
-    }
-
-	returnMoney = () => {
-		const change = this.state.total;
-		this.setState({total: 0, changeGiven: change})
-    }
-    
-    setTotalState = (addedCoin: Coin) => {
-        console.log(addedCoin)
-        this.setState({total: this.state.total + addedCoin.value }, () => console.log(this.state.total))
-    }
-
-    setRejectCoinState = () => {
-        const rejectedCoinsCount = this.state.rejectedCoinsCount + 1;
-		this.setState({rejectedCoinsCount})
-    }
-
-    getCoinSlotSearchBarProps = () => {
-
-        return {
-            error: this.state.error,
-            errorMSG: this.state.errorMSG,
-            returnMoney: this.returnMoney,
-            total: this.state.total
-        }
-    }
 
 }
 

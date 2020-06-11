@@ -1,4 +1,5 @@
 import React from 'react';
+import { CoinProps } from '../types'
 
 export default function CoinSlot(props: CoinProps) {
 
@@ -14,9 +15,3 @@ export default function CoinSlot(props: CoinProps) {
     )
 }
 
-export interface CoinProps {
-    total: number;
-    error: boolean;
-    errorMSG: string;
-    returnMoney: Function;
-}
