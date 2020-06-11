@@ -105,13 +105,7 @@ class VendingMachine extends Component {
 
 	componentDidMount() {
 		if (this.state.bank < 0.15) {
-			this.setState({error: true, errorMSG: 'Exact Change'})
-		}
-	}
-	
-	componentDidUpdate(prevState: VendingMachineState) {
-		if (prevState.bank !== this.state.bank && this.state.bank < 0.15) {
-			this.setState({error: true, errorMSG: 'Exact Change'})
+			this.setState({error: true, errorMSG: 'Exact Change Needed'})
 		}
 	}
 
