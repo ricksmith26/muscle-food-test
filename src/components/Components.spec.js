@@ -1,4 +1,4 @@
-import { render, fireEvent, getNodeText } from '@testing-library/react';
+import { render, fireEvent, getNodeText, create } from '@testing-library/react';
 import React from 'react';
 import VendingMachine from './VendingMachine'
 
@@ -144,6 +144,12 @@ describe('UI elements have the correct affect on UI', () => {
 		fireEvent.click(candy);
 	
 		expect(getNodeText(total)).toMatch('PRICE: $0.65');
+		
+	})
+
+	test('Price displayed is not enough funds', () => {
+
+		const utils = render(<VendingMachine />)
 		
 	})
 })
